@@ -1,5 +1,6 @@
-from menu import Menu
+from clockin import ClockIn
 
-ResidentView = Menu()
+ResidentView = ClockIn()
+ResidentView.getResidents()
 ResidentView.setresidentwidgets()
 ResidentView.mainloop()

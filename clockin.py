@@ -1,12 +1,16 @@
 from tkinter import *
 from tkinter.ttk import *
+import sqlite3
 from person import Person
 from log import Log
+###
+#Need to change class to frame, and create a window manager class(notebook) to hold and manage those frames
+###
 
-
-class Menu(Notebook):
+class ClockIn(Notebook):
     residentTab = None
     names = ['macaire', 'leonard', 'james']
+    namesfour = list()
     namessix = ['shirley', 'colette', 'brayleigh']
     namesseven = ['warren', 'donna', 'vonnie']
     fourstr, sixstr, sevenstr = None, None, None
@@ -42,6 +46,25 @@ class Menu(Notebook):
         sevenradio = Radiobutton(self.residentTab, text="Seventh Floor", style="BW.TRadiobutton", value=2, command=self.sevenfloorcolumns)
         sevenradio.grid(row=1, rowspan=1, column=6, columnspan=1)
 
+    def getResidents(self, floor=4):
+        con = sqlite3.connect('storage.db')
+        cur = con.cursor()
+        if floor == 4:
+            cur.execute("SELECT *, ROWID FROM residents WHERE floor=4")
+        self.namesfour = cur.fetchall()
+            #need to convert this list of tuples into a list of strings
+        con.close()
+        tmp = str()
+        temp = list()
+        if type(self.namesfour == list):
+            for row in self.namesfour:
+                tmp = str()
+                for i in range(2):
+                    tmp += str(row[i]) + ' '
+                temp.append(tmp)
+        self.fourstr = StringVar(value=temp)
+
+
     def fourfloorcolumns(self):
         self.namesbox[0] = Listbox(self.residentTab, listvariable=self.fourstr, height=10)
         self.namesbox[0].grid(column=1, row=3)
@@ -50,7 +73,6 @@ class Menu(Notebook):
         self.namesbox[2] = Listbox(self.residentTab, listvariable=self.sevenstr, height=10)
         self.namesbox[2].grid(column=5, row=3)
         self.bindboxes()
-
 
     def sixfloorcolumns(self):
         self.namesbox[0] = Listbox(self.residentTab, listvariable=self.sixstr, height=10)
@@ -79,9 +101,20 @@ class Menu(Notebook):
             ndex = i.curselection()
             if ndex != ():
                 self.clockin = Button(self.residentTab, text="Clock In", style="BW.TButton")
-                self.clockin.grid(row=4, rowspan=1, columnspan=1, column=1)
+                self.clockin.grid(row=4, rowspan=1, columnspan=1, column=2)
                 self.clockout = Button(self.residentTab, text="Clock Out", style="BW.TButton")
-                self.clockout.grid(row=4, column=3)
+                self.clockout.grid(row=4, column=4)
+
+    def rmv_buttons(self):
+        for i in self.namesbox:
+            i.pack_forget()
 
 
     def ClockIn(self): pass
+
+class CounselorsResidentMenu(Notebook):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+        self.couns_tab = Frame()
+        self.add(self.couns_tab, Text="Counselors")
