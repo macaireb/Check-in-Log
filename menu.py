@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter.ttk import *
-import sqlite3
+import DB_interface
 from person import Person
 from log import Log
 ###
@@ -18,6 +18,7 @@ class menu(Notebook):
         self.master = master
         self.residentTab = Frame()
         self.add(self.residentTab, text="Residents")
+        self.DB = DB_interface.DB_interface()
         style = Style()
         style.configure("BW.TLabel", foreground="blue", background="white")
         style.configure("BW.TRadiobutton", foreground="blue", background="white")
@@ -39,27 +40,12 @@ class menu(Notebook):
             if self.resident_edit.winfo_exists() == 1:
                 self.resident_edit.destroy()
         except AttributeError: pass
-        self.getResidents()
+        self.set_listboxes()
         self.fourfloorcolumns()
         self.showbuttons()
 
-    def getResidents(self, floor=4):
-        con = sqlite3.connect('storage.db')
-        cur = con.cursor()
-        if floor == 4:
-            cur.execute("SELECT *, ROWID FROM residents WHERE floor=4")
-        self.namesfour = cur.fetchall()
-            #need to convert this list of tuples into a list of strings
-        con.close()
-        tmp = str()
-        temp = list()
-        if type(self.namesfour == list):
-            for row in self.namesfour:
-                tmp = str()
-                for i in range(2):
-                    tmp += str(row[i]) + ' '
-                temp.append(tmp)
-        self.fourstr = StringVar(value=temp)
+    def set_listboxes(self):
+        self.fourstr = StringVar(value=self.DB.get_residents())
 
     def destroy_check_in(self):
         for i in range(len(self.namesbox)):
@@ -105,7 +91,7 @@ class menu(Notebook):
             if self.resident_edit.winfo_exists() == 1:
                 self.resident_edit.destroy()
         except AttributeError: pass
-        self.getResidents()
+        self.set_listboxes()
         self.fourfloorcolumns()
         self.resi_fname = Label(self.residentTab, style="BW.TLabel", text="First Name")
         self.resi_fname.grid(row=3, rowspan=1, column=1, columnspan=1)
