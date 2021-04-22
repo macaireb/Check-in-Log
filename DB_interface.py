@@ -1,4 +1,5 @@
 import sqlite3
+import datetime
 
 class DB_interface():
     def get_residents(self, floor=4):
@@ -16,24 +17,39 @@ class DB_interface():
                 tmp = str()
                 for i in range(2):
                     tmp += str(row[i]) + ' '
+                tmp += str(row[4])
                 temp.append(tmp)
         return temp
 
-    def check_resi_clock(self, residents):
+
+    def clock_in(self, resident_index):
+        residents = self.get_residents()
+        current = datetime.datetime.now()
         conn = sqlite3.connect("storage.db")
         cur = conn.cursor()
-        #Format for resident clock table will be fname_lname_clock
-        t_name = (residents[0] + "_" + residents[1] + "_clock", )
-        tmp = cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", t_name)
-        #If resident has no clock table in SQLite, create one
-        if tmp.fetchone() == None:
-            cur.execute('''CREATE TABLE ? (direction text, time integer)''')
-            conn.commit()
+        print(residents[resident_index])
+        cur.execute("INSERT INTO timeclock VALUES (?,'in', ?, ?, ?, ?, ?, ?, ?)", (residents[resident_index][-1], current.year, current.month,
+                    current.day, current.hour, current.minute, current.second, current.microsecond))
+        conn.commit()
         conn.close()
 
-    def punch_resi_clock(self, resident, direction):
+
+#only difference is the string in the query, representing the direction (in/out)
+    def clock_out(self, resident_index):
+        residents = self.get_residents()
+        current = datetime.datetime.now()
         conn = sqlite3.connect("storage.db")
         cur = conn.cursor()
+        print(residents[resident_index])
+        cur.execute("INSERT INTO timeclock VALUES (?,'out', ?, ?, ?, ?, ?, ?, ?)",
+                    (residents[resident_index][-1], current.year, current.month,
+                     current.day, current.hour, current.minute, current.second, current.microsecond))
+        conn.commit()
+        conn.close()
 
-
+    def add_resident(self, fname, lname, floor=4):
+        conn = sqlite3.connect("storage.db")
+        cur = conn.cursor()
+        cur.execute("INSERT INTO residents VALUES (?, ?, ?, 'resident')", (fname, lname, floor))
+        conn.commit()
         conn.close()
