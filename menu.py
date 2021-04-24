@@ -100,7 +100,7 @@ class menu(Notebook):
             resident = resident[self.namesbox[0].curselection()[0]][0:-2]
             print(resident)
             clock_msg = tkinter.messagebox.Message(self.residentTab, title="Success",
-                                                      message= "Clock out made for " + resident)
+                                                      message="Clock out made for " + resident)
             clock_msg.show()
 
 
@@ -129,7 +129,8 @@ class menu(Notebook):
         self.resi_fname.grid(row=3, rowspan=1, column=1, columnspan=1)
         self.resi_lname = Label(self.residentTab, style="BW.TLabel", text="Last Name")
         self.resi_lname.grid(row=3, rowspan=1, column=2, columnspan=1)
-        self.add_resident = Button(self.residentTab, style="BW.TButton", text="Add new resident", command=self.add_resi_to_db)
+        self.add_resident = Button(self.residentTab, style="BW.TButton",
+                                   text="Add new resident", command=self.add_resi_to_db)
         self.add_resident.grid(row=4, rowspan=1, column=3, columnspan=1)
         self.fname_string = StringVar()
         self.add_resi_fname = Entry(self.residentTab, textvariable=self.fname_string)
@@ -137,7 +138,8 @@ class menu(Notebook):
         self.lname_string = StringVar()
         self.add_resi_lname = Entry(self.residentTab, textvariable=self.lname_string)
         self.add_resi_lname.grid(row=4, rowspan=1, column=2, columnspan=1)
-        self.delete_resident = Button(self.residentTab, style="BW.TButton", text="Remove Resident")
+        self.delete_resident = Button(self.residentTab, style="BW.TButton",
+                                      text="Remove Resident", command=self.del_resi_from_db)
         self.delete_resident.grid(row=3, rowspan=1, column=3, columnspan=1)
 
     def add_resi_to_db(self):
@@ -165,6 +167,19 @@ class menu(Notebook):
             self.set_listboxes()
             self.fourfloorcolumns()
 
+    def del_resi_from_db(self):
+        resident = self.DB.get_residents()
+        resident = resident[self.namesbox[0].curselection()[0]]
+        if self.namesbox[0].curselection() != ():
+            self.DB.delete_resident(self.namesbox[0].curselection()[0])
+            complete = tkinter.messagebox.Message(self.residentTab, title="Resident deleted",
+                                          message="Successfully deleted " + resident + "from database")
+            complete.show()
+            for i in range(len(self.namesbox)):
+                if self.namesbox[i].winfo_exists() == 1:
+                    self.namesbox[i].destroy()
+                self.set_listboxes()
+                self.fourfloorcolumns()
 
     def destroy_resident_edit(self):
         for i in range(len(self.namesbox)):

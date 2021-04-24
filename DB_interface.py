@@ -53,3 +53,14 @@ class DB_interface():
         cur.execute("INSERT INTO residents VALUES (?, ?, ?, 'resident')", (fname, lname, floor))
         conn.commit()
         conn.close()
+
+
+    ##get_residents returns a list, but for peace of mind, insure that when ROWID > 1 digit that the slicing still works
+    ##to select all digits
+    def delete_resident(self, resident_index):
+        residents = self.get_residents()
+        conn = sqlite3.connect("storage.db")
+        cur = conn.cursor()
+        cur.execute("DELETE FROM residents WHERE ROWID=?", residents[resident_index][-1])
+        conn.commit()
+        conn.close()
