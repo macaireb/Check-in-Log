@@ -64,3 +64,12 @@ class DB_interface():
         cur.execute("DELETE FROM residents WHERE ROWID=?", residents[resident_index][-1])
         conn.commit()
         conn.close()
+
+    def get_resi_punches(self, resident_key):
+        residents = self.get_residents()
+        conn = sqlite3.connect("storage.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM timeclock WHERE ROWID=?", residents[resident_key][-1])
+        tmp = cur.fetchall()
+        conn.close()
+        return tmp

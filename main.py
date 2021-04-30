@@ -1,4 +1,4 @@
 from menu import *
 
-ResidentView = Main_Menu()
+ResidentView = MainMenu()
 ResidentView.mainloop()
